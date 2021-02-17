@@ -38,12 +38,18 @@ services:
       - ckan_config:/etc/ckan
       - ckan_home:/usr/lib/ckan
       - ckan_storage:/var/lib/ckan
+    networks:
+      ckan_network:
+        ipv4_address: 172.19.0.3
 
   datapusher:
     container_name: datapusher
     image: clementmouchet/datapusher
     ports:
       - "8800:8800"
+    networks:
+      ckan_network:
+        ipv4_address: 172.19.0.4
 
   db:
     container_name: db
@@ -58,14 +64,29 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - pg_data:/var/lib/postgresql/data
+    networks:
+      ckan_network:
+        ipv4_address: 172.19.0.5
 
   solr:
     container_name: solr
     build:
       context: ../../
       dockerfile: contrib/docker/solr/Dockerfile
-
+    networks:
+      ckan_network:
+        ipv4_address: 172.19.0.6
 
   redis:
     container_name: redis
     image: redis:latest
+    networks:
+      ckan_network:
+        ipv4_address: 172.19.0.7
+
+networks:
+  ckan_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
